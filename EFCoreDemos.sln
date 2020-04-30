@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCoreDemos", "EFCoreDemos\EFCoreDemos.csproj", "{E652BA8F-EE0A-4FDE-8E50-07CDF3FB10DA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E652BA8F-EE0A-4FDE-8E50-07CDF3FB10DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E652BA8F-EE0A-4FDE-8E50-07CDF3FB10DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E652BA8F-EE0A-4FDE-8E50-07CDF3FB10DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E652BA8F-EE0A-4FDE-8E50-07CDF3FB10DA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
