@@ -12,11 +12,14 @@ namespace EFCoreDemos
    class Program
    {
       private static bool _activateLazyLoading = false;
+      private static bool _ensureDatabase = false;
 
       static async Task Main()
       {
          var serviceProvider = BuildServiceProvider();
-         await EnsureDatabaseAsync(serviceProvider);
+
+         if (_ensureDatabase)
+            await EnsureDatabaseAsync(serviceProvider);
 
          using var scope = serviceProvider.CreateScope();
 

@@ -43,7 +43,9 @@ namespace EFCoreDemos
          // Approach_1_4();
 
          // Demo_2_1();
-         Approach_2_1();
+         // Approach_2_1();
+
+         Demo_3_1();
       }
 
       private void Demo_1_1()
@@ -147,7 +149,6 @@ namespace EFCoreDemos
                      p.DeliverableUntil > DateTime.Now;
       }
 
-
       private void Demo_2_1()
       {
          var products = _ctx.Products
@@ -157,7 +158,6 @@ namespace EFCoreDemos
                             .ThenInclude(s => s.Seller)
                             .ToList();
       }
-
 
       private void Approach_2_1()
       {
@@ -169,6 +169,28 @@ namespace EFCoreDemos
 
          _ctx.Prices.Where(p => productIds.Contains(p.ProductId)).ToList();
          _ctx.SellerProducts.Include(sp => sp.Seller).Where(p => productIds.Contains(p.ProductId)).ToList();
+      }
+
+
+      private void Demo_3_1()
+      {
+         var groups1 = _ctx.ProductGroups
+                           .Select(g => new
+                                        {
+                                           g.Products.FirstOrDefault().Id,
+                                           g.Products.FirstOrDefault().Name
+                                        })
+                           .ToList();
+
+         var groups2 = _ctx.ProductGroups
+                           .Select(g => g.Products
+                                         .Select(p => new
+                                                      {
+                                                         p.Id,
+                                                         p.Name
+                                                      })
+                                         .FirstOrDefault())
+                           .ToList();
       }
    }
 }

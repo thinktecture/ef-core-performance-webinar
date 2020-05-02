@@ -32,7 +32,12 @@ namespace EFCoreDemos.Database
 
          modelBuilder.Entity<ProductGroup>().HasData(groups);
          modelBuilder.Entity<Studio>().HasData(studios);
-         modelBuilder.Entity<Product>().HasData(products);
+         modelBuilder.Entity<Product>(builder =>
+         {
+            builder.HasIndex(p => new {p.ProductGroupId, p.Id})
+                   .IncludeProperties(p => p.Name);
+            builder.HasData(products);
+         });
          modelBuilder.Entity<Price>().HasData(prices);
          modelBuilder.Entity<Seller>().HasData(sellers);
          modelBuilder.Entity<Seller_Product>(builder =>
@@ -123,6 +128,7 @@ namespace EFCoreDemos.Database
                           .Select(i => new Product
                                        {
                                           Id = i,
+                                          Name = $"Product {i}",
                                           DeliverableFrom = new DateTime(2000, 01, 01),
                                           DeliverableUntil = new DateTime(2030, 01, 01),
                                           ProductGroupId = groups[i % groups.Count].Id,
