@@ -2,6 +2,11 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCoreDemos", "EFCoreDemos\EFCoreDemos.csproj", "{E652BA8F-EE0A-4FDE-8E50-07CDF3FB10DA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "assets", "assets", "{C77888DF-384D-4F67-96A7-3DF66E2A858C}"
+ProjectSection(SolutionItems) = preProject
+	Readme.md = Readme.md
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

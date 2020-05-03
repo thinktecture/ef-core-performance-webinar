@@ -25,27 +25,20 @@ namespace EFCoreDemos
       {
          // The following demos are using the sync-API for simplicity reasons
 
-         N_Plus_1_Queries();
-      }
+         Demo_1_1();
+         Demo_1_2();
 
-      private void N_Plus_1_Queries()
-      {
-         // Demo_1_1();
-         // Demo_1_2();
-         //
-         // Approach_1_1();
-         // Approach_1_2();
+         Approach_1_1();
+         Approach_1_2();
 
-         // Demo_1_3();
-         // Approach_1_3();
+         Demo_1_3();
+         Approach_1_3();
 
-         // Demo_1_4();
-         // Approach_1_4();
+         Demo_1_4();
+         Approach_1_4();
 
-         // Demo_2_1();
-         // Approach_2_1();
-
-         Demo_3_1();
+         Demo_2_1();
+         Approach_2_1();
       }
 
       private void Demo_1_1()
@@ -125,9 +118,16 @@ namespace EFCoreDemos
 
       private void Demo_1_4()
       {
-         var products = _ctx.Products
-                            .Where(p => IsDeliverable(p))
-                            .ToList();
+         try
+         {
+            var products = _ctx.Products
+                               .Where(p => IsDeliverable(p))
+                               .ToList();
+         }
+         catch (Exception ex)
+         {
+            _logger.LogError(ex, $"The method '{nameof(IsDeliverable)}' cannot be translated to SQL.");
+         }
       }
 
       private bool IsDeliverable(Product product)
@@ -169,28 +169,6 @@ namespace EFCoreDemos
 
          _ctx.Prices.Where(p => productIds.Contains(p.ProductId)).ToList();
          _ctx.SellerProducts.Include(sp => sp.Seller).Where(p => productIds.Contains(p.ProductId)).ToList();
-      }
-
-
-      private void Demo_3_1()
-      {
-         var groups1 = _ctx.ProductGroups
-                           .Select(g => new
-                                        {
-                                           g.Products.FirstOrDefault().Id,
-                                           g.Products.FirstOrDefault().Name
-                                        })
-                           .ToList();
-
-         var groups2 = _ctx.ProductGroups
-                           .Select(g => g.Products
-                                         .Select(p => new
-                                                      {
-                                                         p.Id,
-                                                         p.Name
-                                                      })
-                                         .FirstOrDefault())
-                           .ToList();
       }
    }
 }

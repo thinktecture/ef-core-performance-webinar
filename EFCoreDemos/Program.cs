@@ -11,8 +11,8 @@ namespace EFCoreDemos
 {
    class Program
    {
+      private static bool _ensureDatabase = true;
       private static bool _activateLazyLoading = false;
-      private static bool _ensureDatabase = false;
 
       static async Task Main()
       {
