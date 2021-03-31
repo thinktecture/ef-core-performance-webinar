@@ -18,6 +18,6 @@ namespace EFCoreDemos.Database
       public virtual Studio Studio { get; set; }
 
       public virtual List<Price> Prices { get; set; }
-      public virtual List<Seller_Product> SellerProducts { get; set; }
+      public virtual List<Seller> Sellers { get; set; }
    }
 }

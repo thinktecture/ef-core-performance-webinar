@@ -11,20 +11,18 @@ namespace EFCoreDemos
 {
    class Program
    {
-      private static bool _ensureDatabase = true;
-      private static bool _activateLazyLoading = false;
+      private const bool _ENSURE_DATABASE = true;
+      private const bool _ACTIVATE_LAZY_LOADING = false;
 
       static async Task Main()
       {
          var serviceProvider = BuildServiceProvider();
 
-         if (_ensureDatabase)
+         if (_ENSURE_DATABASE)
             await EnsureDatabaseAsync(serviceProvider);
 
          using var scope = serviceProvider.CreateScope();
-
-         var demos = scope.ServiceProvider.GetRequiredService<Demos>();
-         demos.Execute();
+         scope.ServiceProvider.GetRequiredService<Demos>().Execute();
       }
 
       private static async Task EnsureDatabaseAsync(IServiceProvider serviceProvider)
@@ -53,7 +51,7 @@ namespace EFCoreDemos
                         })
                         .AddScoped<Demos>()
                         .AddDbContext<DemoDbContext>((serviceProvider, builder) => builder.UseSqlServer(connString)
-                                                                                          .UseLazyLoadingProxies(_activateLazyLoading)
+                                                                                          .UseLazyLoadingProxies(_ACTIVATE_LAZY_LOADING)
                                                                                           .UseLoggerFactory(serviceProvider.GetRequiredService<ILoggerFactory>())
                                                                                           .EnableDetailedErrors()
                                                                                           .EnableSensitiveDataLogging());

@@ -12,7 +12,6 @@ namespace EFCoreDemos.Database
       public DbSet<Studio> Studios { get; set; }
       public DbSet<Price> Prices { get; set; }
       public DbSet<Seller> Sellers { get; set; }
-      public DbSet<Seller_Product> SellerProducts { get; set; }
 
       public DemoDbContext(DbContextOptions<DemoDbContext> options)
          : base(options)
@@ -30,24 +29,47 @@ namespace EFCoreDemos.Database
          var sellers = GenerateSellers(2);
          var sellerProducts = GenerateSellerProducts(products, sellers);
 
-         modelBuilder.Entity<ProductGroup>().HasData(groups);
-         modelBuilder.Entity<Studio>().HasData(studios);
+         modelBuilder.Entity<ProductGroup>(builder =>
+                                           {
+                                              builder.Property(g => g.Id).ValueGeneratedNever();
+                                              builder.HasData(groups);
+                                           });
+         modelBuilder.Entity<Studio>(builder =>
+                                     {
+                                        builder.Property(s => s.Id).ValueGeneratedNever();
+                                        builder.HasData(studios);
+                                     });
          modelBuilder.Entity<Product>(builder =>
-         {
-            builder.HasIndex(p => new {p.ProductGroupId, p.Id})
-                   .IncludeProperties(p => p.Name);
-            builder.HasData(products);
-         });
-         modelBuilder.Entity<Price>().HasData(prices);
-         modelBuilder.Entity<Seller>().HasData(sellers);
-         modelBuilder.Entity<Seller_Product>(builder =>
-         {
-            builder.HasKey(e => new {e.ProductId, e.SellerId});
-            builder.HasData(sellerProducts);
-         });
+                                      {
+                                         builder.Property(p => p.Id).ValueGeneratedNever();
+                                         builder.HasIndex(p => new { p.ProductGroupId, p.Id })
+                                                .IncludeProperties(p => p.Name);
+                                         builder.HasData(products);
+                                      });
+         modelBuilder.Entity<Price>(builder =>
+                                    {
+                                       builder.Property(p => p.Id).ValueGeneratedNever();
+                                       builder.HasData(prices);
+                                    });
+         modelBuilder.Entity<Seller>(builder =>
+                                     {
+                                        builder.Property(s => s.Id).ValueGeneratedNever();
+
+                                        builder.HasMany(s => s.Products)
+                                               .WithMany(p => p.Sellers)
+                                               .UsingEntity<Seller_Product>(sellerProductsBuilder => sellerProductsBuilder.HasOne(sp => sp.Product).WithMany(),
+                                                                            sellerProductsBuilder => sellerProductsBuilder.HasOne(sp => sp.Seller).WithMany(),
+                                                                            sellerProductsBuilder =>
+                                                                            {
+                                                                               sellerProductsBuilder.ToTable("SellerProducts");
+                                                                               sellerProductsBuilder.HasKey(sp => new { sp.ProductId, sp.SellerId });
+                                                                               sellerProductsBuilder.HasData(sellerProducts);
+                                                                            });
+                                        builder.HasData(sellers);
+                                     });
       }
 
-      private List<Price> GeneratePrices(
+      private static List<Price> GeneratePrices(
          List<Product> products,
          int numberOfPricesPerProduct)
       {
@@ -68,7 +90,7 @@ namespace EFCoreDemos.Database
          return prices;
       }
 
-      private List<Seller> GenerateSellers(int numberOfSellers)
+      private static List<Seller> GenerateSellers(int numberOfSellers)
       {
          return Enumerable.Range(1, numberOfSellers)
                           .Select(i => new Seller
@@ -79,16 +101,16 @@ namespace EFCoreDemos.Database
                           .ToList();
       }
 
-      private List<Seller_Product> GenerateSellerProducts(
+      private static List<object> GenerateSellerProducts(
          List<Product> products,
          List<Seller> sellers)
       {
-         var sellersProduct = new List<Seller_Product>();
+         var sellersProduct = new List<object>();
 
          foreach (var product in products)
          foreach (var seller in sellers)
          {
-            sellersProduct.Add(new Seller_Product
+            sellersProduct.Add(new
                                {
                                   ProductId = product.Id,
                                   SellerId = seller.Id
@@ -98,7 +120,7 @@ namespace EFCoreDemos.Database
          return sellersProduct;
       }
 
-      private List<Studio> GenerateStudio(int numberOfStudios)
+      private static List<Studio> GenerateStudio(int numberOfStudios)
       {
          return Enumerable.Range(1, numberOfStudios)
                           .Select(i => new Studio
@@ -109,7 +131,7 @@ namespace EFCoreDemos.Database
                           .ToList();
       }
 
-      private List<ProductGroup> GenerateProductGroups(int numberOfGroups)
+      private static List<ProductGroup> GenerateProductGroups(int numberOfGroups)
       {
          return Enumerable.Range(1, numberOfGroups)
                           .Select(i => new ProductGroup
@@ -119,7 +141,7 @@ namespace EFCoreDemos.Database
                           .ToList();
       }
 
-      private List<Product> GenerateProducts(
+      private static List<Product> GenerateProducts(
          List<ProductGroup> groups,
          List<Studio> studios,
          int numberOfProducts)

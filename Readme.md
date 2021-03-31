@@ -8,4 +8,4 @@
 
 Die einzelnen Demos sind in `Demos.cs` zu finden. Es sollte pro Durchlauf genau nur 1 Demo laufen, ansonsten sieht man den erwarteten Effekt ggf. nicht, da der `DbContext` ein Cache ist.  
 
-Für einige Demos muss das Lazy-Loading aktiviert sein, diese haben den Kommentar `Activate lazy-loading`. Hierfür muss die Variable `_activateLazyLoading` in `Program.cs` auf `true` gesetzt werden.  
+Für einige Demos muss das Lazy-Loading aktiviert sein, diese haben den Kommentar `Activate lazy-loading`. Hierfür muss die Variable `_ENSURE_DATABASE` in `Program.cs` auf `true` gesetzt werden.  
