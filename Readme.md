@@ -1,11 +1,11 @@
 # Entity Framework Core - Performance-Optimierung aus der Praxis
 
 ## Setup
-1) Als erstes sollte geprüft werden ob der `ConnectionString` in `appsettings.json` stimmt.
-2) Mithilfe der Variable `_ensureDatabase` in `Program.cs`kann das automatische Anlegen der Datenbank ein- und abgeschaltet werden. Beim ersten Durchlauf muss die Variable `true` sein.
+1) `ConnectionString` in `appsettings.json` prüfen.
+2) Die Variable `_ensureDatabase` in `Program.cs` schaltet das automatische Anlegen der Datenbank ein- und aus. Beim ersten Durchlauf muss die Variable `true` sein.
 
 ## Verwendung
 
-Die einzelnen Demos sind in `Demos.cs` zu finden. Es sollte pro Durchlauf genau nur 1 Demo laufen, ansonsten sieht man den erwarteten Effekt ggf. nicht, da der `DbContext` ein Cache ist.  
+Die Klasse `Demos.cs` enthält die einzelnen Demos. Pro Durchlauf nur 1 Demo laufen lassen, ansonsten sieht man den erwarteten Effekt ggf. nicht, da der `DbContext` ein Cache ist.  
 
 Für einige Demos muss das Lazy-Loading aktiviert sein, diese haben den Kommentar `Activate lazy-loading`. Hierfür muss die Variable `_ENSURE_DATABASE` in `Program.cs` auf `true` gesetzt werden.  

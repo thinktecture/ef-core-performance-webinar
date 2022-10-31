@@ -1,25 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <TargetFramework>net5.0</TargetFramework>
-        <LangVersion>9.0</LangVersion>
-    </PropertyGroup>
+   <PropertyGroup>
+      <OutputType>Exe</OutputType>
+      <TargetFramework>net7.0</TargetFramework>
+      <LangVersion>11.0</LangVersion>
+      <ImplicitUsings>true</ImplicitUsings>
+   </PropertyGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="5.0.4" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.4" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
-      <PackageReference Include="Serilog" Version="2.10.0" />
-      <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
-      <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
-      <PackageReference Include="Serilog.Sinks.Console" Version="3.1.1" />
-    </ItemGroup>
+   <ItemGroup>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="7.0.0-rc.2.22472.11" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.0-rc.2.22472.11" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0-rc.2.22472.3" />
+      <PackageReference Include="Serilog" Version="2.12.0" />
+      <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
+      <PackageReference Include="Serilog.Settings.Configuration" Version="3.4.0" />
+      <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
+   </ItemGroup>
 
-    <ItemGroup>
+   <ItemGroup>
       <None Update="appsettings.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-    </ItemGroup>
+   </ItemGroup>
 
 </Project>
