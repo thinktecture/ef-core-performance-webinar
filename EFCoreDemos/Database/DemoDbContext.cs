@@ -8,6 +8,7 @@ public class DemoDbContext : DbContext
    public DbSet<ProductGroup> ProductGroups { get; set; }
    public DbSet<Studio> Studios { get; set; }
    public DbSet<Price> Prices { get; set; }
+   public DbSet<Seller_Product> SellerProducts { get; set; }
    public DbSet<Seller> Sellers { get; set; }
 
    public DemoDbContext(DbContextOptions<DemoDbContext> options)
@@ -148,7 +149,7 @@ public class DemoDbContext : DbContext
                        .Select(i => new Product
                                     {
                                        Id = i,
-                                       Name = $"Product {i}",
+                                       Name = i % 2 == 0 ? "Infinity" : "Endgame",
                                        DeliverableFrom = new DateTime(2000, 01, 01),
                                        DeliverableUntil = new DateTime(2030, 01, 01),
                                        ProductGroupId = groups[i % groups.Count].Id,

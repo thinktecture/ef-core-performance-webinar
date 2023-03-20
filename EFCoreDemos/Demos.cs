@@ -34,8 +34,8 @@ public class Demos
       // Approach_2_1();
       //
       // Demo_2_2();
-      // Approach_2_2();
-      // Approach_2_2_without_AsSplitQuery();
+      // Approach_2_2_with_AsSplitQuery();
+      // Approach_2_2_manual_query_splitting();
 
       // Demo_3_1();
    }
@@ -88,14 +88,19 @@ public class Demos
 
       var productIds = products.Select(p => p.Id);
 
-      var prices = GetPrices(productIds);
+      var pricesByProductId = GetPrices(productIds);
+
+      foreach (var product in products)
+      {
+         product.Prices = pricesByProductId[product.Id].ToList();
+      }
    }
 
-   private List<Price> GetPrices(IEnumerable<int> productIds)
+   private ILookup<int, Price> GetPrices(IEnumerable<int> productIds)
    {
       return _ctx.Prices
                  .Where(p => productIds.Contains(p.ProductId))
-                 .ToList();
+                 .ToLookup(p => p.ProductId);
    }
 
    private void Demo_1_3()
@@ -136,103 +141,118 @@ public class Demos
 
    private void Demo_2_2()
    {
-      var result = _ctx.ProductGroups
-                       // .AsSplitQuery() // leads to an InvalidOperationException
-                       .Select(g => new
+      var result = _ctx.Studios
+                       .Select(s => new
                                     {
-                                       Group = g,
-                                       Products = g.Products
+                                       Studio = s,
+                                       Infinity = s.Products
+                                                   .Where(p => p.Name.Contains("Infinity"))
                                                    .Select(p => new
                                                                 {
                                                                    Product = p,
                                                                    p.Prices,
                                                                    p.Sellers
-                                                                })
+                                                                }),
+                                       Endgame = s.Products
+                                                  .Where(p => p.Name.Contains("Endgame"))
+                                                  .Select(p => new
+                                                               {
+                                                                  Product = p,
+                                                                  p.Prices,
+                                                                  p.Sellers
+                                                               })
                                     })
                        .ToList();
    }
 
-   private void Approach_2_2()
+   private void Approach_2_2_with_AsSplitQuery()
    {
-      var groupQuery = _ctx.ProductGroups; // may have additional filters
-
-      var groups = groupQuery.ToList();
-
-      var products = groupQuery.SelectMany(g => g.Products)
-                               .AsSplitQuery()
-                               .Include(p => p.Prices)
-                               .Include(p => p.Sellers)
-                               .ToList();
-
-      // Build the desired data structure
-      var result = groups
-                   // .AsSplitQuery() // leads to an InvalidOperationException
-                   .Select(g => new
-                                {
-                                   Group = g,
-                                   Products = g.Products // "Products" is populated thanks to ChangeTracking
-                                               .Select(p => new
-                                                            {
-                                                               Product = p,
-                                                               p.Prices,
-                                                               p.Sellers
-                                                            })
-                                })
-                   .ToList();
+      var result = _ctx.Studios
+                       .AsSplitQuery()
+                       .Select(s => new
+                                    {
+                                       Studio = s,
+                                       Infinity = s.Products
+                                                   .Where(p => p.Name.Contains("Infinity"))
+                                                   .Select(p => new
+                                                                {
+                                                                   Product = p,
+                                                                   p.Prices,
+                                                                   p.Sellers
+                                                                }),
+                                       Endgame = s.Products
+                                                  .Where(p => p.Name.Contains("Endgame"))
+                                                  .Select(p => new
+                                                               {
+                                                                  Product = p,
+                                                                  p.Prices,
+                                                                  p.Sellers
+                                                               })
+                                    })
+                       .ToList();
    }
 
-   // Alternative way without "AsSplitQuery" (which was the only way before EF 5)
-   private void Approach_2_2_without_AsSplitQuery()
+   private void Approach_2_2_manual_query_splitting()
    {
-      var groupQuery = _ctx.ProductGroups; // may have additional filters
-      var groups = groupQuery.ToList();
-
-      var productsQuery = groupQuery.SelectMany(g => g.Products); // may have additional filters
-      var products = productsQuery.ToList();                      // Alternatively, we can fetch the Products along with the ProductGroups
-
-      var prices = productsQuery.SelectMany(p => p.Prices).ToList();
+      var studiosQuery = _ctx.Studios;
+      var studios = studiosQuery.ToList();
+      var infinityProductsQuery = studiosQuery.SelectMany(s => s.Products).Where(p => p.Name.Contains("Infinity"));
+      var endgameProductsQuery = studiosQuery.SelectMany(s => s.Products).Where(p => p.Name.Contains("Endgame"));
+      var infinityProducts = infinityProductsQuery.ToList();
+      var endgameProducts = endgameProductsQuery.ToList();
+      var productIds = infinityProducts.Concat(endgameProducts).Select(p => p.Id);
+      var prices = _ctx.Prices.Where(p => productIds.Contains(p.ProductId)).ToList();
 
       // cannot use "productsQuery.Select(p => p.Sellers)" because JoinTable "Seller_Product" won't be selected
-      var sellers = _ctx.Set<Seller_Product>()
-                        .Join(productsQuery, sp => sp.ProductId, p => p.Id, (sp, p) => sp)
+      var sellers = _ctx.SellerProducts.Where(sp => productIds.Contains(sp.ProductId))
                         .Include(sp => sp.Seller)
                         .ToList();
 
       // Build the desired data structure
-      var result = groups
-                   // .AsSplitQuery() // leads to an InvalidOperationException
-                   .Select(g => new
+      var result = studios
+                   .Select(s => new
                                 {
-                                   Group = g,
-                                   Products = g.Products // "Products" is populated thanks to ChangeTracking
+                                   Studio = s,
+                                   // "Products" is populated thanks to ChangeTracking
+                                   Infinity = s.Products
+                                               .Where(p => p.Name.Contains("Infinity"))
                                                .Select(p => new
                                                             {
                                                                Product = p,
                                                                p.Prices,
                                                                p.Sellers
-                                                            })
+                                                            }),
+                                   Endgame = s.Products
+                                              .Where(p => p.Name.Contains("Endgame"))
+                                              .Select(p => new
+                                                           {
+                                                              Product = p,
+                                                              p.Prices,
+                                                              p.Sellers
+                                                           })
                                 })
                    .ToList();
    }
 
    private void Demo_3_1()
    {
-      var groups1 = _ctx.ProductGroups
-                        .Select(g => new
-                                     {
-                                        g.Products.FirstOrDefault().Id,
-                                        g.Products.FirstOrDefault().Name
-                                     })
-                        .ToList();
+      var results1 = _ctx.Studios
+                         .Select(s => new
+                                      {
+                                         s.Products.OrderBy(p => p.Id).FirstOrDefault().Id,
+                                         s.Products.OrderBy(p => p.Id).FirstOrDefault().Name
+                                      })
+                         .ToList();
 
-      var groups2 = _ctx.ProductGroups
-                        .Select(g => g.Products
-                                      .Select(p => new
-                                                   {
-                                                      p.Id,
-                                                      p.Name
-                                                   })
-                                      .FirstOrDefault())
-                        .ToList();
+      var results2 = _ctx.Studios
+                         .Select(s => s.Products
+                                       .OrderBy(p => p.Id)
+                                       .Select(p => new
+                                                    {
+                                                       p.Id,
+                                                       p.Name
+                                                    })
+                                       .FirstOrDefault())
+                         .ToList();
    }
 }
