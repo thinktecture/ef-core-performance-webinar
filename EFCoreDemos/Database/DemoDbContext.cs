@@ -5,7 +5,6 @@ namespace EFCoreDemos.Database;
 public class DemoDbContext : DbContext
 {
    public DbSet<Product> Products { get; set; }
-   public DbSet<ProductGroup> ProductGroups { get; set; }
    public DbSet<Studio> Studios { get; set; }
    public DbSet<Price> Prices { get; set; }
    public DbSet<Seller_Product> SellerProducts { get; set; }
@@ -20,18 +19,12 @@ public class DemoDbContext : DbContext
    {
       base.OnModelCreating(modelBuilder);
 
-      var groups = GenerateProductGroups(10);
       var studios = GenerateStudio(5);
-      var products = GenerateProducts(groups, studios, 100);
+      var products = GenerateProducts(studios, 100);
       var prices = GeneratePrices(products, 10);
       var sellers = GenerateSellers(2);
       var sellerProducts = GenerateSellerProducts(products, sellers);
 
-      modelBuilder.Entity<ProductGroup>(builder =>
-                                        {
-                                           builder.Property(g => g.Id).ValueGeneratedNever();
-                                           builder.HasData(groups);
-                                        });
       modelBuilder.Entity<Studio>(builder =>
                                   {
                                      builder.Property(s => s.Id).ValueGeneratedNever();
@@ -40,8 +33,6 @@ public class DemoDbContext : DbContext
       modelBuilder.Entity<Product>(builder =>
                                    {
                                       builder.Property(p => p.Id).ValueGeneratedNever();
-                                      builder.HasIndex(p => new { p.ProductGroupId, p.Id })
-                                             .IncludeProperties(p => p.Name);
                                       builder.HasData(products);
                                    });
       modelBuilder.Entity<Price>(builder =>
@@ -130,18 +121,7 @@ public class DemoDbContext : DbContext
                        .ToList();
    }
 
-   private static List<ProductGroup> GenerateProductGroups(int numberOfGroups)
-   {
-      return Enumerable.Range(1, numberOfGroups)
-                       .Select(i => new ProductGroup
-                                    {
-                                       Id = i
-                                    })
-                       .ToList();
-   }
-
    private static List<Product> GenerateProducts(
-      List<ProductGroup> groups,
       List<Studio> studios,
       int numberOfProducts)
    {
@@ -152,7 +132,6 @@ public class DemoDbContext : DbContext
                                        Name = i % 2 == 0 ? "Infinity" : "Endgame",
                                        DeliverableFrom = new DateTime(2000, 01, 01),
                                        DeliverableUntil = new DateTime(2030, 01, 01),
-                                       ProductGroupId = groups[i % groups.Count].Id,
                                        StudioId = studios[i % studios.Count].Id
                                     })
                        .ToList();

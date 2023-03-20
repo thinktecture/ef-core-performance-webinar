@@ -8,9 +8,6 @@ public class Product
    public DateTime DeliverableFrom { get; set; }
    public DateTime DeliverableUntil { get; set; }
 
-   public int ProductGroupId { get; set; }
-   public virtual ProductGroup ProductGroup { get; set; }
-
    public int StudioId { get; set; }
    public virtual Studio Studio { get; set; }
 

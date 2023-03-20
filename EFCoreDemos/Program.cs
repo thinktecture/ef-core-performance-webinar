@@ -9,7 +9,7 @@ namespace EFCoreDemos;
 
 class Program
 {
-   private const bool _ENSURE_DATABASE = false;
+   private const bool _ENSURE_DATABASE = true;
    private const bool _ACTIVATE_LAZY_LOADING = false;
 
    static async Task Main()
