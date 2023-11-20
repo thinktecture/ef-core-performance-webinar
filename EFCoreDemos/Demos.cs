@@ -196,19 +196,18 @@ public class Demos
    {
       var studiosQuery = _ctx.Studios;
       var studios = studiosQuery.ToList();
-      var infinityProductsQuery = studiosQuery.SelectMany(s => s.Products).Where(p => p.Name.Contains("Infinity"));
-      var endgameProductsQuery = studiosQuery.SelectMany(s => s.Products).Where(p => p.Name.Contains("Endgame"));
-      var infinityProducts = infinityProductsQuery.ToList();
-      var endgameProducts = endgameProductsQuery.ToList();
+      var infinityProducts = studiosQuery.SelectMany(s => s.Products).Where(p => p.Name.Contains("Infinity")).ToList();
+      var endgameProducts = studiosQuery.SelectMany(s => s.Products).Where(p => p.Name.Contains("Endgame")).ToList();
       var productIds = infinityProducts.Concat(endgameProducts).Select(p => p.Id);
       var prices = _ctx.Prices.Where(p => productIds.Contains(p.ProductId)).ToList();
 
-      // cannot use "productsQuery.Select(p => p.Sellers)" because JoinTable "Seller_Product" won't be selected
+      // cannot use "productsQuery.Select(p => p.Sellers)" because JoinTable "Seller_Product" won't be selected,
+      // thus Change Tracker won't wire up the property "Sellers" on the products.
       var sellers = _ctx.SellerProducts.Where(sp => productIds.Contains(sp.ProductId))
                         .Include(sp => sp.Seller)
                         .ToList();
 
-      // Build the desired data structure
+      // Build the desired data structure in memory
       var result = studios
                    .Select(s => new
                                 {
